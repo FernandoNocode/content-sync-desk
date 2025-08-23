@@ -1,9 +1,9 @@
-import { LayoutGrid, Calendar, Settings, PlusCircle, Lightbulb } from 'lucide-react';
+import { LayoutGrid, Calendar, Settings, PlusCircle, Lightbulb, User } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
 
 interface SidebarProps {
-  currentView: 'kanban' | 'schedule' | 'management' | 'ideas';
-  onViewChange: (view: 'kanban' | 'schedule' | 'management' | 'ideas') => void;
+  currentView: 'kanban' | 'schedule' | 'management' | 'ideas' | 'profile';
+  onViewChange: (view: 'kanban' | 'schedule' | 'management' | 'ideas' | 'profile') => void;
 }
 
 export const Sidebar = ({ currentView, onViewChange }: SidebarProps) => {
@@ -40,6 +40,12 @@ export const Sidebar = ({ currentView, onViewChange }: SidebarProps) => {
       label: 'Gerenciamento',
       icon: Settings,
       description: 'Canais & Equipe'
+    },
+    {
+      id: 'profile' as const,
+      label: 'Perfil',
+      icon: User,
+      description: 'Meu Perfil'
     }
   ];
 

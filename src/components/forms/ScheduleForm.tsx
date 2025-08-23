@@ -21,13 +21,14 @@ export const ScheduleForm: React.FC<ScheduleFormProps> = ({ video, canal, onSubm
       const date = new Date(today);
       date.setDate(today.getDate() + i);
       
-      const dayName = date.toLocaleDateString('pt-BR', { weekday: 'long' });
-      const formattedDay = dayName.charAt(0).toUpperCase() + dayName.slice(1);
+      const dayIndex = date.getDay();
+      const dayNames = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+      const dayName = dayNames[dayIndex];
       
-      if (canal.dias_postagem.includes(formattedDay)) {
+      if (canal.dias_postagem.includes(dayName)) {
         dates.push({
           value: date.toISOString().split('T')[0],
-          label: `${date.toLocaleDateString('pt-BR')} (${formattedDay})`,
+          label: `${date.toLocaleDateString('pt-BR')} (${dayName})`,
           date: date
         });
       }

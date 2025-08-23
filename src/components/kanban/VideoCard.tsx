@@ -1,4 +1,4 @@
-import { Clock, User, Hash } from 'lucide-react';
+import { Clock, User, Hash, FolderOpen } from 'lucide-react';
 import type { Video } from '@/contexts/AppContext';
 import { VideoCardActions } from './VideoCardActions';
 import { useApp } from '@/contexts/AppContext';
@@ -88,6 +88,22 @@ export const VideoCard = ({ video, onDragStart, onDragEnd, onThumbnailToggle }: 
           {video.data_criacao.toLocaleDateString('pt-BR')}
         </span>
       </div>
+
+      {/* Google Drive Link Indicator */}
+      {video.google_drive_link && (
+        <div className="flex items-center gap-2 mb-2">
+          <FolderOpen className="w-3 h-3 text-blue-500" />
+          <a 
+            href={video.google_drive_link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-blue-500 hover:text-blue-600 hover:underline"
+            onClick={(e) => e.stopPropagation()}
+          >
+            Pasta do Drive
+          </a>
+        </div>
+      )}
       
       {/* Status Badge */}
       <div className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium border status-${video.status}`}>

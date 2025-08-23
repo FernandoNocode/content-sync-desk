@@ -56,19 +56,7 @@ export const Header = ({ currentView }: HeaderProps) => {
             />
           </div>
 
-          {/* Filter */}
-          <button className="btn-ghost">
-            <Filter className="w-4 h-4" />
-          </button>
 
-          {/* Add Button */}
-          <button className="btn-primary">
-            <Plus className="w-4 h-4 mr-2" />
-            {currentView === 'ideas' && 'Nova Ideia'}
-            {currentView === 'kanban' && 'Novo Vídeo'}
-            {currentView === 'schedule' && 'Agendar'}
-            {currentView === 'management' && 'Adicionar'}
-          </button>
 
           {/* Logout Button */}
           <button onClick={signOut} className="btn-ghost text-red-500 hover:text-red-600">

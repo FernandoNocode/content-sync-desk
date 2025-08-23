@@ -147,6 +147,7 @@
     @apply bg-gradient-to-r from-primary to-primary-dark text-primary-foreground;
     @apply px-6 py-3 rounded-lg font-medium transition-all duration-200;
     @apply hover:shadow-glow hover:scale-105 active:scale-95;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none;
   }
   
   .btn-secondary {

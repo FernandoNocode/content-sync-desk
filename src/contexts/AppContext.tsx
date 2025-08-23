@@ -39,6 +39,7 @@ export interface Video {
   data_agendada?: Date;
   hora_agendada?: string;
   thumbnail_pronta: boolean;
+  google_drive_link?: string;
   user_id?: string;
 }
 
@@ -201,6 +202,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       data_agendada: video.data_agendada ? new Date(video.data_agendada) : undefined,
       hora_agendada: video.hora_agendada,
       thumbnail_pronta: video.thumbnail_pronta,
+      google_drive_link: video.google_drive_link,
       user_id: video.user_id
     }));
     
@@ -488,6 +490,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           data_agendada: video.data_agendada?.toISOString(),
           hora_agendada: video.hora_agendada,
           thumbnail_pronta: video.thumbnail_pronta,
+          google_drive_link: video.google_drive_link,
           user_id: user.id
         })
         .select()
@@ -507,6 +510,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         data_agendada: data.data_agendada ? new Date(data.data_agendada) : undefined,
         hora_agendada: data.hora_agendada,
         thumbnail_pronta: data.thumbnail_pronta,
+        google_drive_link: data.google_drive_link,
         user_id: data.user_id
       };
       
@@ -650,6 +654,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         data_agendada: undefined,
         hora_agendada: undefined,
         thumbnail_pronta: true,
+        google_drive_link: undefined,
       };
       
       await addVideo(backToVideo);
@@ -734,6 +739,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         data_agendada: undefined,
         hora_agendada: undefined,
         thumbnail_pronta: false,
+        google_drive_link: undefined,
       };
 
       await addVideo(newVideo);

@@ -7,8 +7,9 @@ import { KanbanBoard } from '@/components/kanban/KanbanBoard';
 import { ScheduleView } from '@/components/schedule/ScheduleView';
 import { ManagementView } from '@/components/management/ManagementView';
 import { IdeasBank } from '@/components/ideas/IdeasBank';
+import { UserProfile } from '@/components/profile/UserProfile';
 
-type ViewType = 'kanban' | 'schedule' | 'management' | 'ideas';
+type ViewType = 'kanban' | 'schedule' | 'management' | 'ideas' | 'profile';
 
 const Index = () => {
   const { user, loading } = useAuth();
@@ -46,6 +47,8 @@ const Index = () => {
         return <ScheduleView />;
       case 'management':
         return <ManagementView />;
+      case 'profile':
+        return <UserProfile />;
       default:
         return <IdeasBank />;
     }

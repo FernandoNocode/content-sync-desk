@@ -25,8 +25,14 @@ export const ScheduleView = () => {
     const canal = canais.find(c => c.id === canalId);
     if (!canal) return { data: 'N/A', hora: 'N/A' };
 
+    // Verifica se o canal tem dias e horários configurados
+    if (!canal.dias_postagem || canal.dias_postagem.length === 0 || 
+        !canal.horarios_postagem || canal.horarios_postagem.length === 0) {
+      return { data: 'N/A', hora: 'N/A' };
+    }
+
     const today = startOfDay(new Date());
-    let checkDate = today;
+    let checkDate = addDays(today, 1); // Começa a verificar a partir de amanhã
     
     // Verifica os próximos 30 dias
     for (let i = 0; i < 30; i++) {

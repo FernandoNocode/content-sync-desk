@@ -60,10 +60,6 @@ export const KanbanColumn = ({
             {videos.length}
           </span>
         </div>
-        
-        <button className="btn-ghost p-1">
-          <Plus className="w-4 h-4" />
-        </button>
       </div>
 
       {/* Video Cards */}
@@ -85,12 +81,7 @@ export const KanbanColumn = ({
           </div>
         )}
       </div>
-      
-      {/* Add New Button */}
-      <button className="w-full btn-ghost border-2 border-dashed border-border hover:border-primary mt-4 py-3">
-        <Plus className="w-4 h-4 mr-2" />
-        Adicionar Vídeo
-      </button>
+
     </div>
   );
 };

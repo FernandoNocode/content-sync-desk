@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MoreHorizontal, User, Trash2, ArrowLeft, Check } from 'lucide-react';
+import { MoreHorizontal, User, Trash2, ArrowLeft, Check, FolderOpen } from 'lucide-react';
 import { useApp, type Video, type Usuario } from '@/contexts/AppContext';
 
 interface VideoCardActionsProps {
@@ -11,7 +11,9 @@ export const VideoCardActions = ({ video, onThumbnailToggle }: VideoCardActionsP
   const { usuarios, updateVideo, deleteVideo, moveVideoToIdeas } = useApp();
   const [showActions, setShowActions] = useState(false);
   const [showAssignModal, setShowAssignModal] = useState(false);
+  const [showDriveModal, setShowDriveModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<string>(video.responsavel_id || '');
+  const [driveLink, setDriveLink] = useState<string>(video.google_drive_link || '');
 
   const handleAssignUser = () => {
     const usuario = usuarios.find(u => u.id === selectedUser);
@@ -35,6 +37,14 @@ export const VideoCardActions = ({ video, onThumbnailToggle }: VideoCardActionsP
       moveVideoToIdeas(video.id);
       setShowActions(false);
     }
+  };
+
+  const handleUpdateDriveLink = () => {
+    updateVideo(video.id, {
+      google_drive_link: driveLink || undefined,
+    });
+    setShowDriveModal(false);
+    setShowActions(false);
   };
 
   return (
@@ -68,6 +78,18 @@ export const VideoCardActions = ({ video, onThumbnailToggle }: VideoCardActionsP
               <User className="w-3 h-3" />
               Atribuir
             </button>
+            {video.status === 'ideias' && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowDriveModal(true);
+                }}
+                className="w-full px-3 py-2 text-left text-sm hover:bg-muted flex items-center gap-2"
+              >
+                <FolderOpen className="w-3 h-3" />
+                {video.google_drive_link ? 'Editar Drive' : 'Adicionar Drive'}
+              </button>
+            )}
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -135,6 +157,62 @@ export const VideoCardActions = ({ video, onThumbnailToggle }: VideoCardActionsP
                 className="btn-ghost flex-1"
               >
                 Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Google Drive Link Modal */}
+      {showDriveModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-background border border-border rounded-lg shadow-xl w-full max-w-lg sm:max-w-2xl lg:max-w-4xl mx-auto">
+            {/* Header */}
+            <div className="px-6 py-4 border-b border-border">
+              <h3 className="text-lg font-semibold text-foreground">
+                {video.google_drive_link ? 'Editar' : 'Adicionar'} Link do Google Drive
+              </h3>
+              <p className="text-sm text-muted-foreground mt-1">
+                {video.titulo}
+              </p>
+            </div>
+            
+            {/* Content */}
+            <div className="px-6 py-4">
+              <label className="block text-sm font-medium text-foreground mb-2">
+                Link da Pasta do Google Drive
+              </label>
+              <input 
+                type="url"
+                value={driveLink}
+                onChange={(e) => setDriveLink(e.target.value)}
+                placeholder="https://drive.google.com/drive/folders/..."
+                className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                autoFocus
+              />
+              <p className="text-sm text-muted-foreground mt-2">
+                Cole aqui o link da pasta do Google Drive com todos os arquivos necessários para este vídeo.
+              </p>
+            </div>
+            
+            {/* Footer */}
+            <div className="px-4 sm:px-6 py-3 sm:py-4 border-t border-border bg-muted/20 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
+              <button 
+                onClick={() => {
+                  setShowDriveModal(false);
+                  setShowActions(false);
+                  setDriveLink(video.google_drive_link || '');
+                }} 
+                className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-muted-foreground bg-background border border-border rounded-md hover:bg-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+              >
+                Cancelar
+              </button>
+              <button 
+                onClick={handleUpdateDriveLink} 
+                className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-primary-foreground bg-primary border border-transparent rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={!driveLink.trim()}
+              >
+                {video.google_drive_link ? 'Atualizar Link' : 'Adicionar Link'}
               </button>
             </div>
           </div>
