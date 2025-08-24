@@ -7,6 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { User, Session } from '@supabase/supabase-js';
+import { MemberLogin } from '@/components/auth/MemberLogin';
+import { useMemberAuth } from '@/contexts/MemberAuthContext';
 
 const Auth = () => {
   const [email, setEmail] = useState('');
@@ -14,8 +16,10 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
+  const [showMemberLogin, setShowMemberLogin] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { isMemberAuthenticated } = useMemberAuth();
 
   useEffect(() => {
     // Set up auth state listener
@@ -44,6 +48,13 @@ const Auth = () => {
 
     return () => subscription.unsubscribe();
   }, [navigate]);
+
+  // Redirect member to member area if authenticated
+  useEffect(() => {
+    if (isMemberAuthenticated) {
+      navigate('/member-area');
+    }
+  }, [isMemberAuthenticated, navigate]);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -154,6 +165,12 @@ const Auth = () => {
     );
   }
 
+  if (showMemberLogin) {
+    return (
+      <MemberLogin onBackToAdmin={() => setShowMemberLogin(false)} />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
@@ -165,7 +182,7 @@ const Auth = () => {
         <CardContent>
           <Tabs defaultValue="login" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">Login</TabsTrigger>
+              <TabsTrigger value="login">Login Admin</TabsTrigger>
               <TabsTrigger value="signup">Cadastro</TabsTrigger>
             </TabsList>
             
@@ -245,6 +262,16 @@ const Auth = () => {
               </form>
             </TabsContent>
           </Tabs>
+          
+          <div className="mt-6 text-center">
+            <button
+              onClick={() => setShowMemberLogin(true)}
+              className="text-sm text-blue-600 hover:text-blue-800 underline"
+              disabled={loading}
+            >
+              Acesso para membros
+            </button>
+          </div>
         </CardContent>
       </Card>
     </div>

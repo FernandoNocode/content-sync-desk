@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug localStorage</title>
+</head>
+<body>
+    <h1>Debug localStorage</h1>
+    <div id="output"></div>
+    <script>
+        const output = document.getElementById('output');
+        
+        function log(message) {
+            output.innerHTML += '<p>' + message + '</p>';
+            console.log(message);
+        }
+        
+        log('=== VERIFICANDO LOCALSTORAGE ===');
+        log('dev_members: ' + localStorage.getItem('dev_members'));
+        log('member_session_token: ' + localStorage.getItem('member_session_token'));
+        log('member_local_session: ' + localStorage.getItem('member_local_session'));
+        
+        // Parse and show dev_members if exists
+        const devMembers = localStorage.getItem('dev_members');
+        if (devMembers) {
+            try {
+                const members = JSON.parse(devMembers);
+                log('=== MEMBROS ENCONTRADOS ===');
+                members.forEach((member, index) => {
+                    log(`Membro ${index + 1}: ${member.username} / ${member.email} / senha: ${member.password}`);
+                });
+            } catch (e) {
+                log('Erro ao parsear dev_members: ' + e.message);
+            }
+        } else {
+            log('Nenhum membro encontrado no localStorage');
+        }
+    </script>
+</body>
+</html>

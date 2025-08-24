@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Login de Membros</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .json-display {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            white-space: pre-wrap;
+            font-family: monospace;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Teste Completo do Sistema de Login de Membros</h1>
+    
+    <div class="test-section">
+        <h2>1. Verificação do localStorage</h2>
+        <button onclick="checkLocalStorage()">Verificar localStorage</button>
+        <div id="localStorage-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Criar Membro Manualmente (se necessário)</h2>
+        <button onclick="createTestMember()">Criar Membro de Teste</button>
+        <div id="create-member-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Teste de Login</h2>
+        <button onclick="testLogin()">Testar Login</button>
+        <div id="login-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. Logs do Console</h2>
+        <button onclick="clearLogs()">Limpar Logs</button>
+        <div id="console-logs"></div>
+    </div>
+
+    <script>
+        // Capturar logs do console
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        let consoleLogs = [];
+        
+        function addLog(type, message) {
+            const timestamp = new Date().toLocaleTimeString();
+            consoleLogs.push({ type, message, timestamp });
+            updateConsoleLogs();
+        }
+        
+        console.log = function(...args) {
+            addLog('log', args.join(' '));
+            originalLog.apply(console, args);
+        };
+        
+        console.error = function(...args) {
+            addLog('error', args.join(' '));
+            originalError.apply(console, args);
+        };
+        
+        console.warn = function(...args) {
+            addLog('warn', args.join(' '));
+            originalWarn.apply(console, args);
+        };
+        
+        function updateConsoleLogs() {
+            const logsDiv = document.getElementById('console-logs');
+            logsDiv.innerHTML = consoleLogs.map(log => 
+                `<div class="result ${log.type === 'error' ? 'error' : log.type === 'warn' ? 'error' : 'info'}">
+                    [${log.timestamp}] ${log.type.toUpperCase()}: ${log.message}
+                </div>`
+            ).join('');
+        }
+        
+        function clearLogs() {
+            consoleLogs = [];
+            updateConsoleLogs();
+        }
+        
+        function checkLocalStorage() {
+            const resultDiv = document.getElementById('localStorage-result');
+            
+            try {
+                // Verificar se existe a chave dev_members
+                const devMembers = localStorage.getItem('dev_members');
+                
+                if (!devMembers) {
+                    resultDiv.innerHTML = `
+                        <div class="result error">
+                            ❌ Chave 'dev_members' não encontrada no localStorage
+                        </div>
+                    `;
+                    return;
+                }
+                
+                const members = JSON.parse(devMembers);
+                
+                // Procurar pelo membro fernandomineiro
+                const targetMember = members.find(m => 
+                    m.username === 'fernandomineiro' || 
+                    m.email === 'fernandonocode@gmail.com'
+                );
+                
+                if (targetMember) {
+                    resultDiv.innerHTML = `
+                        <div class="result success">
+                            ✅ Membro encontrado no localStorage!
+                        </div>
+                        <div class="json-display">${JSON.stringify(targetMember, null, 2)}</div>
+                        <div class="result info">
+                            Total de membros no localStorage: ${members.length}
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="result error">
+                            ❌ Membro 'fernandomineiro' não encontrado
+                        </div>
+                        <div class="result info">
+                            Membros encontrados: ${members.length}
+                        </div>
+                        <div class="json-display">${JSON.stringify(members, null, 2)}</div>
+                    `;
+                }
+                
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="result error">
+                        ❌ Erro ao verificar localStorage: ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        function createTestMember() {
+            const resultDiv = document.getElementById('create-member-result');
+            
+            try {
+                // Criar o membro de teste
+                const testMember = {
+                    id: 'test-member-id',
+                    username: 'fernandomineiro',
+                    email: 'fernandonocode@gmail.com',
+                    password: '123456',
+                    nome: 'Fernando Mineiro',
+                    is_active: true,
+                    created_at: new Date().toISOString()
+                };
+                
+                // Obter membros existentes ou criar array vazio
+                let members = [];
+                const existingMembers = localStorage.getItem('dev_members');
+                if (existingMembers) {
+                    members = JSON.parse(existingMembers);
+                }
+                
+                // Verificar se já existe
+                const existingIndex = members.findIndex(m => 
+                    m.username === 'fernandomineiro' || 
+                    m.email === 'fernandonocode@gmail.com'
+                );
+                
+                if (existingIndex >= 0) {
+                    // Atualizar membro existente
+                    members[existingIndex] = testMember;
+                    resultDiv.innerHTML = `
+                        <div class="result info">
+                            ℹ️ Membro atualizado no localStorage
+                        </div>
+                    `;
+                } else {
+                    // Adicionar novo membro
+                    members.push(testMember);
+                    resultDiv.innerHTML = `
+                        <div class="result success">
+                            ✅ Membro criado no localStorage
+                        </div>
+                    `;
+                }
+                
+                // Salvar no localStorage
+                localStorage.setItem('dev_members', JSON.stringify(members));
+                
+                resultDiv.innerHTML += `
+                    <div class="json-display">${JSON.stringify(testMember, null, 2)}</div>
+                `;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="result error">
+                        ❌ Erro ao criar membro: ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        function testLogin() {
+            const resultDiv = document.getElementById('login-result');
+            
+            resultDiv.innerHTML = `
+                <div class="result info">
+                    🔄 Testando login...
+                </div>
+            `;
+            
+            // Simular o processo de login
+            try {
+                console.log('=== INICIANDO TESTE DE LOGIN ===');
+                console.log('Username: fernandomineiro');
+                console.log('Password: 123456');
+                
+                // Verificar localStorage primeiro
+                const devMembers = localStorage.getItem('dev_members');
+                if (!devMembers) {
+                    throw new Error('dev_members não encontrado no localStorage');
+                }
+                
+                const members = JSON.parse(devMembers);
+                console.log('Membros no localStorage:', members.length);
+                
+                // Buscar membro
+                const member = members.find(m => 
+                    (m.username === 'fernandomineiro' || m.email === 'fernandomineiro') &&
+                    m.is_active
+                );
+                
+                if (!member) {
+                    throw new Error('Membro não encontrado ou inativo');
+                }
+                
+                console.log('Membro encontrado:', member);
+                
+                // Verificar senha
+                if (member.password !== '123456') {
+                    throw new Error(`Senha incorreta. Esperado: 123456, Encontrado: ${member.password}`);
+                }
+                
+                console.log('Senha validada com sucesso');
+                
+                // Simular criação de sessão
+                const sessionToken = 'test-session-' + Date.now();
+                localStorage.setItem('member_session', JSON.stringify({
+                    token: sessionToken,
+                    member: member,
+                    expires: Date.now() + (24 * 60 * 60 * 1000) // 24 horas
+                }));
+                
+                console.log('Sessão criada:', sessionToken);
+                
+                resultDiv.innerHTML = `
+                    <div class="result success">
+                        ✅ Login realizado com sucesso!
+                    </div>
+                    <div class="result info">
+                        Token de sessão: ${sessionToken}
+                    </div>
+                    <div class="json-display">${JSON.stringify(member, null, 2)}</div>
+                `;
+                
+            } catch (error) {
+                console.error('Erro no login:', error.message);
+                resultDiv.innerHTML = `
+                    <div class="result error">
+                        ❌ Falha no login: ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        // Executar verificação inicial
+        window.onload = function() {
+            console.log('=== PÁGINA DE TESTE CARREGADA ===');
+            checkLocalStorage();
+        };
+    </script>
+</body>
+</html>

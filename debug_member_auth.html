@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Member Auth</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+        pre { background: #f5f5f5; padding: 10px; overflow-x: auto; }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>Debug Member Authentication</h1>
+    
+    <div class="section">
+        <h2>1. Verificar localStorage</h2>
+        <button onclick="checkLocalStorage()">Verificar dev_members</button>
+        <div id="localStorage-result"></div>
+    </div>
+    
+    <div class="section">
+        <h2>2. Criar membro no localStorage</h2>
+        <button onclick="createMemberInLocalStorage()">Criar fernandomineiro</button>
+        <div id="create-result"></div>
+    </div>
+    
+    <div class="section">
+        <h2>3. Testar login local</h2>
+        <button onclick="testLocalLogin()">Testar login</button>
+        <div id="login-result"></div>
+    </div>
+    
+    <div class="section">
+        <h2>4. Limpar dados</h2>
+        <button onclick="clearLocalData()">Limpar localStorage</button>
+        <div id="clear-result"></div>
+    </div>
+
+    <script>
+        function checkLocalStorage() {
+            const result = document.getElementById('localStorage-result');
+            const devMembers = localStorage.getItem('dev_members');
+            
+            if (devMembers) {
+                try {
+                    const members = JSON.parse(devMembers);
+                    result.innerHTML = `
+                        <div class="success">✓ dev_members encontrado!</div>
+                        <pre>${JSON.stringify(members, null, 2)}</pre>
+                    `;
+                } catch (e) {
+                    result.innerHTML = `<div class="error">✗ Erro ao parsear dev_members: ${e.message}</div>`;
+                }
+            } else {
+                result.innerHTML = '<div class="error">✗ dev_members não encontrado no localStorage</div>';
+            }
+        }
+        
+        function createMemberInLocalStorage() {
+            const result = document.getElementById('create-result');
+            
+            const member = {
+                id: `member_${Date.now()}`,
+                username: 'fernandomineiro',
+                email: 'fernandonocode@gmail.com',
+                password: '123456', // Senha em texto simples para desenvolvimento
+                nome: 'Fernando Mineiro',
+                is_active: true,
+                created_at: new Date().toISOString()
+            };
+            
+            // Verificar se já existe dev_members
+            let members = [];
+            const existing = localStorage.getItem('dev_members');
+            if (existing) {
+                try {
+                    members = JSON.parse(existing);
+                } catch (e) {
+                    console.error('Erro ao parsear membros existentes:', e);
+                }
+            }
+            
+            // Remover membro existente com mesmo username ou email
+            members = members.filter(m => m.username !== member.username && m.email !== member.email);
+            
+            // Adicionar novo membro
+            members.push(member);
+            
+            // Salvar no localStorage
+            localStorage.setItem('dev_members', JSON.stringify(members));
+            
+            result.innerHTML = `
+                <div class="success">✓ Membro criado com sucesso!</div>
+                <pre>${JSON.stringify(member, null, 2)}</pre>
+            `;
+        }
+        
+        function testLocalLogin() {
+            const result = document.getElementById('login-result');
+            const devMembers = localStorage.getItem('dev_members');
+            
+            if (!devMembers) {
+                result.innerHTML = '<div class="error">✗ dev_members não encontrado. Crie o membro primeiro.</div>';
+                return;
+            }
+            
+            try {
+                const members = JSON.parse(devMembers);
+                const username = 'fernandomineiro';
+                const email = 'fernandonocode@gmail.com';
+                const password = '123456';
+                
+                // Testar login por username
+                const memberByUsername = members.find(m => m.username === username);
+                const memberByEmail = members.find(m => m.email === email);
+                
+                let loginResult = '';
+                
+                if (memberByUsername) {
+                    if (memberByUsername.password === password) {
+                        loginResult += '<div class="success">✓ Login por username: SUCESSO</div>';
+                    } else {
+                        loginResult += `<div class="error">✗ Login por username: senha incorreta (esperado: ${password}, encontrado: ${memberByUsername.password})</div>`;
+                    }
+                } else {
+                    loginResult += '<div class="error">✗ Login por username: usuário não encontrado</div>';
+                }
+                
+                if (memberByEmail) {
+                    if (memberByEmail.password === password) {
+                        loginResult += '<div class="success">✓ Login por email: SUCESSO</div>';
+                    } else {
+                        loginResult += `<div class="error">✗ Login por email: senha incorreta (esperado: ${password}, encontrado: ${memberByEmail.password})</div>`;
+                    }
+                } else {
+                    loginResult += '<div class="error">✗ Login por email: usuário não encontrado</div>';
+                }
+                
+                result.innerHTML = loginResult;
+                
+            } catch (e) {
+                result.innerHTML = `<div class="error">✗ Erro ao testar login: ${e.message}</div>`;
+            }
+        }
+        
+        function clearLocalData() {
+            const result = document.getElementById('clear-result');
+            
+            // Limpar dados relacionados a membros
+            localStorage.removeItem('dev_members');
+            localStorage.removeItem('member_session_token');
+            localStorage.removeItem('member_local_session');
+            
+            result.innerHTML = '<div class="success">✓ Dados locais limpos!</div>';
+        }
+        
+        // Verificar automaticamente ao carregar a página
+        window.onload = function() {
+            checkLocalStorage();
+        };
+    </script>
+</body>
+</html>

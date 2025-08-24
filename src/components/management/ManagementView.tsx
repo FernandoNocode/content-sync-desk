@@ -1,16 +1,21 @@
 import { useState } from 'react';
 import { Plus, Edit, Trash2, Users, Hash, Globe, BarChart3, Calendar, Clock, Upload } from 'lucide-react';
 import { useApp } from '@/contexts/AppContext';
+import { useMember } from '@/contexts/MemberContext';
 import { CanalForm } from '@/components/forms/CanalForm';
 import { UsuarioForm } from '@/components/forms/UsuarioForm';
+import { MemberForm } from '@/components/forms/MemberForm';
 
 export const ManagementView = () => {
   const { canais, usuarios, addCanal, updateCanal, deleteCanal, addUsuario, updateUsuario, deleteUsuario } = useApp();
-  const [activeTab, setActiveTab] = useState<'canais' | 'equipe'>('canais');
+  const { members, createMember, updateMember, deleteMember } = useMember();
+  const [activeTab, setActiveTab] = useState<'canais' | 'equipe' | 'membros'>('canais');
   const [showCanalForm, setShowCanalForm] = useState(false);
   const [showUsuarioForm, setShowUsuarioForm] = useState(false);
+  const [showMemberForm, setShowMemberForm] = useState(false);
   const [editingCanal, setEditingCanal] = useState<any>(null);
   const [editingUsuario, setEditingUsuario] = useState<any>(null);
+  const [editingMember, setEditingMember] = useState<any>(null);
 
   const handleAddCanal = () => {
     setEditingCanal(null);
@@ -64,6 +69,32 @@ export const ManagementView = () => {
     setEditingUsuario(null);
   };
 
+  const handleAddMember = () => {
+    setEditingMember(null);
+    setShowMemberForm(true);
+  };
+
+  const handleEditMember = (member: any) => {
+    setEditingMember(member);
+    setShowMemberForm(true);
+  };
+
+  const handleDeleteMember = (id: string) => {
+    if (confirm('Tem certeza que deseja excluir este membro?')) {
+      deleteMember(id);
+    }
+  };
+
+  const handleMemberSubmit = (memberData: any) => {
+    if (editingMember) {
+      updateMember(editingMember.id, memberData);
+    } else {
+      createMember(memberData);
+    }
+    setShowMemberForm(false);
+    setEditingMember(null);
+  };
+
   return (
     <div className="space-y-6">
       {/* Tab Navigation */}
@@ -89,6 +120,17 @@ export const ManagementView = () => {
         >
           <Users className="w-4 h-4 inline mr-2" />
           Equipe
+        </button>
+        <button
+          onClick={() => setActiveTab('membros')}
+          className={`px-4 py-2 font-medium border-b-2 transition-colors ${
+            activeTab === 'membros'
+              ? 'border-primary text-primary'
+              : 'border-transparent text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          <Users className="w-4 h-4 inline mr-2" />
+          Membros
         </button>
       </div>
 
@@ -126,6 +168,8 @@ export const ManagementView = () => {
                           </span>
                         </div>
                       )}
+
+
                       <input
                         type="file"
                         accept="image/*"
@@ -252,15 +296,98 @@ export const ManagementView = () => {
         </div>
       )}
 
+      {/* Membros Tab */}
+      {activeTab === 'membros' && (
+        <div className="space-y-6">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-bold text-foreground">Gerenciar Membros</h2>
+            <button onClick={handleAddMember} className="btn-primary">
+              <Plus className="w-4 h-4 mr-2" />
+              Criar Membro
+            </button>
+          </div>
+
+          <div className="card-primary overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-background-tertiary">
+                  <tr>
+                    <th className="text-left p-4 font-medium text-foreground">Nome</th>
+                    <th className="text-left p-4 font-medium text-foreground">Usuário</th>
+                    <th className="text-left p-4 font-medium text-foreground">Email</th>
+                    <th className="text-left p-4 font-medium text-foreground">Status</th>
+                    <th className="text-left p-4 font-medium text-foreground">Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {members.map((member, index) => (
+                    <tr
+                      key={member.id}
+                      className={`border-t border-border ${
+                        index % 2 === 0 ? 'bg-background' : 'bg-background-secondary'
+                      }`}
+                    >
+                      <td className="p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                            {member.nome?.charAt(0) || '?'}
+                          </div>
+                          <span className="text-sm font-medium">{member.nome}</span>
+                        </div>
+                      </td>
+                      <td className="p-4 text-muted-foreground">{member.username}</td>
+                      <td className="p-4 text-muted-foreground">{member.email}</td>
+                      <td className="p-4">
+                        <span className={`px-2 py-1 rounded text-sm ${
+                          member.is_active 
+                            ? 'bg-success/20 text-success' 
+                            : 'bg-destructive/20 text-destructive'
+                        }`}>
+                          {member.is_active ? 'Ativo' : 'Inativo'}
+                        </span>
+                      </td>
+                      <td className="p-4">
+                        <div className="flex gap-2">
+                          <button 
+                            onClick={() => handleEditMember(member)} 
+                            className="btn-ghost p-2"
+                            title="Editar membro"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          <button 
+                            onClick={() => handleDeleteMember(member.id)} 
+                            className="btn-ghost p-2 text-destructive"
+                            title="Excluir membro"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Equipe Tab */}
       {activeTab === 'equipe' && (
         <div className="space-y-6">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-bold text-foreground">Gerenciar Equipe</h2>
-            <button onClick={handleAddUsuario} className="btn-primary">
-              <Plus className="w-4 h-4 mr-2" />
-              Convidar Membro
-            </button>
+            <div className="flex gap-2">
+              <button onClick={handleAddUsuario} className="btn-secondary">
+                <Plus className="w-4 h-4 mr-2" />
+                Convidar Admin
+              </button>
+              <button onClick={() => setShowMemberForm(true)} className="btn-primary">
+                <Plus className="w-4 h-4 mr-2" />
+                Criar Membro
+              </button>
+            </div>
           </div>
 
           <div className="card-primary overflow-hidden">
@@ -342,6 +469,17 @@ export const ManagementView = () => {
           onCancel={() => {
             setShowUsuarioForm(false);
             setEditingUsuario(null);
+          }}
+        />
+      )}
+
+      {showMemberForm && (
+        <MemberForm
+          member={editingMember}
+          onSubmit={handleMemberSubmit}
+          onCancel={() => {
+            setShowMemberForm(false);
+            setEditingMember(null);
           }}
         />
       )}

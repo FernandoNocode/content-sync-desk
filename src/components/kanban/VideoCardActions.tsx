@@ -67,7 +67,7 @@ export const VideoCardActions = ({ video, onThumbnailToggle }: VideoCardActionsP
             className="fixed inset-0 z-40" 
             onClick={() => setShowActions(false)}
           />
-          <div className="absolute top-8 right-0 z-50 bg-card border border-border rounded-md shadow-lg py-1 min-w-[140px]">
+          <div className="absolute top-8 right-0 z-50 bg-card border border-border rounded-md shadow-lg py-1 min-w-36">
             <button
               onClick={(e) => {
                 e.stopPropagation();
